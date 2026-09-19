@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How Britain's electricity got cleaner, $first_year to today</title>
+<meta name="description" content="Analysis of $rows half-hours of GB electricity generation data: the coal phase-out, the rise of wind, and the cleanest times of day to use power.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+<style>
+  :root {
+    --ink: #16202a;
+    --ink-soft: #4d5a66;
+    --rule: #dde2e6;
+    --paper: #ffffff;
+    --wash: #f3f6f6;
+    --teal: #156e60;
+    --rust: #7a2a1a;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    font-variation-settings: "wdth" 100;
+    font-size: 17px;
+    line-height: 1.6;
+    font-feature-settings: "tnum" 1;
+  }
+  a { color: var(--teal); text-underline-offset: 2px; }
+  a:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; border-radius: 2px; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+  .prose { max-width: 66ch; }
+
+  .byline { padding-top: 28px; font-size: 15px; color: var(--ink-soft); }
+
+  h1 {
+    font-variation-settings: "wdth" 72;
+    font-weight: 800;
+    font-size: clamp(2.3rem, 6.4vw, 4.6rem);
+    line-height: 1.02;
+    letter-spacing: -0.01em;
+    margin: 18px 0 16px;
+    max-width: 17ch;
+  }
+  .lede { font-size: 1.15rem; color: var(--ink-soft); margin: 0 0 28px; }
+
+  .stripes-block { margin: 0 0 12px; }
+  .stripes {
+    display: flex;
+    height: clamp(110px, 20vw, 200px);
+    width: 100%;
+  }
+  .stripe { flex: 1 1 0; min-width: 0; }
+  .stripe-axis {
+    position: relative;
+    height: 22px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 6px;
+  }
+  .stripe-axis span { position: absolute; transform: translateX(-2px); white-space: nowrap; }
+  .scale {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-top: 10px;
+  }
+  .scale-bar {
+    width: 160px; height: 10px;
+    background: linear-gradient(90deg, rgb(21,110,96), rgb(120,178,160), rgb(236,232,214), rgb(205,120,80), rgb(122,42,26));
+  }
+
+  section { padding: 56px 0 8px; border-top: 1px solid var(--rule); margin-top: 48px; }
+  h2 {
+    font-variation-settings: "wdth" 85;
+    font-weight: 700;
+    font-size: clamp(1.5rem, 3.2vw, 2.1rem);
+    line-height: 1.15;
+    margin: 0 0 14px;
+  }
+  .chart { width: 100%; height: 440px; margin: 24px 0 8px; }
+  .chart.heat { height: 460px; }
+  .note { font-size: 14px; color: var(--ink-soft); }
+
+  .takeaway {
+    background: var(--wash);
+    border-left: 4px solid var(--teal);
+    padding: 16px 20px;
+    margin: 20px 0 0;
+    max-width: 66ch;
+  }
+
+  dl.records { margin: 20px 0 0; max-width: 760px; }
+  dl.records div {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 24px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  dl.records dt { font-weight: 600; }
+  dl.records dd { margin: 0; text-align: right; font-weight: 700; font-size: 1.1rem; }
+  dl.records .when { grid-column: 1 / -1; font-size: 14px; color: var(--ink-soft); }
+
+  ul.checks { padding-left: 1.2em; max-width: 66ch; }
+  ul.checks li { margin-bottom: 8px; }
+
+  footer { border-top: 1px solid var(--rule); margin-top: 56px; padding: 24px 0 48px; font-size: 14px; color: var(--ink-soft); }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    .chart { height: 380px; }
+    .chart.heat { height: 420px; }
+    .stripe-axis .minor { display: none; }
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <p class="byline">Data analysis by <a href="https://github.com/imsv1301">Mohammad Sahil Vahora</a>. Data up to $updated.</p>
+
+  <h1>Britain's electricity is $fall_pct% cleaner than in $first_year</h1>
+  <p class="lede prose">Each stripe below is one month of the GB grid, coloured by how many grams of CO₂ were emitted for every kilowatt-hour generated. In $first_year the average was $ci_first g/kWh. In $last_full_year it was $ci_last.</p>
+
+  <div class="stripes-block">
+    <div class="stripes" role="img" aria-label="Monthly carbon intensity of GB electricity from $first_year to $updated, falling from around $ci_first to around $ci_last grams per kilowatt-hour">$stripes</div>
+    <div class="stripe-axis" aria-hidden="true">$stripe_axis</div>
+    <div class="scale"><span>Cleaner</span><span class="scale-bar" aria-hidden="true"></span><span>Dirtier</span></div>
+  </div>
+
+  <section>
+    <h2>Coal went, wind arrived</h2>
+    <div class="prose">
+      <p>The dirtiest year on record was $peak_year, when coal supplied $peak_coal% of generation and the grid averaged $peak_ci g/kWh. Coal then fell from $coal_2015% in 2015 to $coal_2016% in 2016, with gas ($gas_2016%) filling most of the gap. The last half-hour where coal made up more than 1% of generation was $coal_last_time.</p>
+      <p>Wind generated more than gas across a full year for the first time in $wind_year. In $last_full_year wind supplied $wind_last% of generation against $gas_last% for gas, and imports reached $imports_last%.</p>
+    </div>
+    <div id="area" class="chart" role="img" aria-label="Stacked area chart of GB generation share by source for each year"></div>
+    <p class="note">Share of total generation by source, per year. Wind includes embedded (distribution-connected) wind. The final year is partial.</p>
+  </section>
+
+  <section>
+    <h2>When is the grid cleanest?</h2>
+    <p class="prose">Average carbon intensity for each hour of the day and month of the year, over the latest 12 months of data (UK local time).</p>
+    <div id="heat" class="chart heat" role="img" aria-label="Heatmap of average carbon intensity by hour of day and month"></div>
+    <div class="takeaway">
+      <p style="margin:0">From October to February, electricity is cleanest around $w_clean overnight and dirtiest around $w_dirty, at the evening demand peak. From April to August, solar moves the cleanest window to the middle of the day, around $s_clean, and the dirtiest to around $s_dirty. Running an EV charger or a heat pump in the clean window cuts its emissions without using any less power.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Records</h2>
+    <dl class="records">
+      <div><dt>Lowest carbon intensity</dt><dd>$low_value g/kWh</dd><span class="when">$low_time</span></div>
+      <div><dt>Highest wind share</dt><dd>$wind_rec%</dd><span class="when">$wind_rec_time</span></div>
+      <div><dt>Highest solar share</dt><dd>$solar_rec%</dd><span class="when">$solar_rec_time</span></div>
+      <div><dt>Last time coal supplied over 1%</dt><dd>&nbsp;</dd><span class="when">$coal_last_time</span></div>
+    </dl>
+  </section>
+
+  <section>
+    <h2>How the data was checked</h2>
+    <p class="prose">The source has $rows half-hourly rows. Before any analysis, the pipeline runs SQL checks and stops if the basics fail.</p>
+    <ul class="checks">
+      <li>No duplicate timestamps and no missing half-hours between the first and last reading.</li>
+      <li>The individual fuel columns add up to the published total generation in every row.</li>
+      <li>The published zero-carbon percentage column disagrees with its own zero-carbon total in $mismatch rows ($mismatch_pct%), and goes above 100% in $over100. This analysis ignores the published percentage columns and recalculates every share from the raw megawatt figures.</li>
+      <li>$coal_blips half-hours report small amounts of coal after Britain's last coal station closed. They are too small to affect any result and are kept as published.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Method and code</h2>
+    <div class="prose">
+      <p>Python and pandas load and tidy the data, SQL run in DuckDB does the aggregation, and Plotly draws the charts. Averages are weighted by generation, so a windy night with low demand doesn't count as much as a busy weekday. A scheduled GitHub Actions workflow downloads the latest data and rebuilds this page every week.</p>
+      <p><a href="https://github.com/imsv1301/gb-grid-decarbonisation">Code, SQL and processed data on GitHub</a>. Source: <a href="https://www.neso.energy/data-portal/historic-generation-mix">NESO historic generation mix</a>, published under the NESO Open Data Licence.</p>
+    </div>
+  </section>
+</main>
+<footer>
+  <div class="wrap">Built by Mohammad Sahil Vahora, electronics engineering graduate based in Bristol. <a href="https://github.com/imsv1301">GitHub</a></div>
+</footer>
+<script>
+  var cfg = { displayModeBar: false, responsive: true };
+  var base = {
+    paper_bgcolor: "rgba(0,0,0,0)",
+    plot_bgcolor: "rgba(0,0,0,0)",
+    font: { family: "Archivo, Helvetica Neue, Arial, sans-serif", size: 13, color: "#16202a" }
+  };
+  function draw(id, spec) {
+    var layout = Object.assign({}, base, spec.layout);
+    Plotly.newPlot(id, spec.data, layout, cfg);
+  }
+  draw("area", $area_json);
+  draw("heat", $heat_json);
+</script>
+</body>
+</html>

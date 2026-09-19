@@ -1,0 +1,5 @@
+# Raw source file (~60 MB) is downloaded by src/pipeline.py
+data/df_fuel_ckan.csv
+__pycache__/
+.venv/
+.DS_Store

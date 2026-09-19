@@ -1,0 +1,5 @@
+record,local_time,value,unit
+Lowest carbon intensity in a half-hour,"15 Apr 2024, 14:30",19.0,gCO2/kWh
+Highest wind share in a half-hour,"26 Oct 2025, 23:30",73.6,% of generation
+Highest solar share in a half-hour,"24 May 2026, 12:30",47.0,% of generation
+Last half-hour where coal was over 1% of generation,"30 Sep 2024, 15:00",,
