@@ -2,6 +2,6 @@ check_name,failures
 duplicate timestamps,0
 missing half-hours,0
 fuel columns do not sum to GENERATION (>5 MW),0
-published ZERO_CARBON_perc disagrees with ZERO_CARBON / GENERATION (>1 pt),266776
+published ZERO_CARBON_perc disagrees with ZERO_CARBON / GENERATION (>1 pt),266874
 published ZERO_CARBON_perc above 100%,2
 coal output reported after Ratcliffe closed (Oct 2024 onwards),7
